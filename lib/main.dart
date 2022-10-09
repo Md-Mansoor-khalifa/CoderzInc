@@ -1,15 +1,13 @@
-import 'package:coderz_inc/Screens/AddEvent.dart';
-import 'package:coderz_inc/Screens/AdminDashboardScreen.dart';
-import 'package:coderz_inc/Screens/HomeScreen.dart';
-import 'package:coderz_inc/Screens/LoginScreen.dart';
-import 'package:coderz_inc/EmployeeModel.dart';
+import 'package:coderz_inc/AddEvent.dart';
+import 'package:coderz_inc/AdminDashboardScreen.dart';
+
 import 'package:coderz_inc/dbHelper/mongodb.dart';
-import 'package:coderz_inc/display.dart';
 import 'package:coderz_inc/provider/user_provider.dart';
 import 'package:coderz_inc/services/auth_services.dart';
 import 'package:flutter/material.dart';
-import 'package:mongo_dart/mongo_dart.dart' as M;
 import 'package:provider/provider.dart';
+
+import 'Screens/LoginScreen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
