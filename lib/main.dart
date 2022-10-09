@@ -1,3 +1,5 @@
+import 'package:coderz_inc/AddEvent.dart';
+import 'package:coderz_inc/AdminDashboardScreen.dart';
 import 'package:coderz_inc/LoginScreen.dart';
 import 'package:coderz_inc/MongoDbModel.dart';
 import 'package:coderz_inc/dbHelper/mongodb.dart';
@@ -21,7 +23,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const LoginScreen(),
+      home: const AdminDashboardScreen(),
     );
   }
 }
