@@ -1,12 +1,14 @@
-import 'package:coderz_inc/AddEvent.dart';
-import 'package:coderz_inc/AdminDashboardScreen.dart';
-
+import 'package:coderz_inc/Screens/AdminAddEmployee.dart';
+import 'package:coderz_inc/Screens/employee_profile_screen.dart';
+import 'package:coderz_inc/Screens/employeedashboard.dart';
 import 'package:coderz_inc/dbHelper/mongodb.dart';
 import 'package:coderz_inc/provider/user_provider.dart';
 import 'package:coderz_inc/services/auth_services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'Screens/AddEvent.dart';
+import 'Screens/AdminDashboardScreen.dart';
 import 'Screens/LoginScreen.dart';
 
 void main() async {
@@ -44,7 +46,7 @@ class _MyAppState extends State<MyApp> {
       home: Provider.of<UserProvider>(context).user.token.isEmpty
           ? const LoginScreen()
           : Provider.of<UserProvider>(context).user.role == "user"
-              ? AddEvent()
+              ? EmployeeDashboard()
               : AdminDashboardScreen(),
     );
   }

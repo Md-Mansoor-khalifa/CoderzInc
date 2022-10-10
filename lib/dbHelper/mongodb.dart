@@ -20,6 +20,19 @@ class MongoDatabase {
     return arrData;
   }
 
+  static Future<List<Map<String, dynamic>>> getOneUser(email) async {
+    final arrData =
+        await userCollection.find(where.eq("email", email)).toList();
+    return arrData;
+  }
+
+  static Future<List<Map<String, dynamic>>> getUserEvents(String email) async {
+    final arrEvents =
+        await eventCollection.find(where.eq("email", email)).toList();
+
+    return arrEvents;
+  }
+
   static Future<String> insert(MongoDbModel data) async {
     try {
       var result = await userCollection.insertOne(data.toJson());

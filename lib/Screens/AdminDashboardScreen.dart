@@ -1,7 +1,6 @@
 import 'package:coderz_inc/EmployeeModel.dart';
-import 'package:coderz_inc/Screens/employee_profile_screen.dart';
+import 'package:coderz_inc/Screens/updateEmployee.dart';
 import 'package:coderz_inc/dbHelper/mongodb.dart';
-import 'package:coderz_inc/models/user.dart';
 import 'package:flutter/material.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
@@ -98,7 +97,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => EmployeeProfileScreen(),
+                    builder: (context) =>
+                        UpdateEmployee(email: data.email.toString()),
                   ),
                 );
               },

@@ -79,6 +79,8 @@ class AuthService {
           SharedPreferences prefs = await SharedPreferences.getInstance();
           userProvider.setUser(res.body);
           await prefs.setString('x-auth-token', jsonDecode(res.body)['token']);
+          await prefs.setString('email', jsonDecode(res.body)['email']);
+          await prefs.setString('uid', jsonDecode(res.body)['_id']);
           print(jsonDecode(res.body)['role']);
           if (jsonDecode(res.body)['role'] == "admin") {
             navigator.pushAndRemoveUntil(

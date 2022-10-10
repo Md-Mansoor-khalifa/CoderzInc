@@ -1,15 +1,11 @@
-import 'dart:async';
-
-import 'package:coderz_inc/Screens/AdminDashboardScreen.dart';
 import 'package:coderz_inc/dbHelper/mongodb.dart';
 import 'package:coderz_inc/utils/EventModel.dart';
 import 'package:coderz_inc/utils/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:intl/intl.dart';
+
 import 'package:mongo_dart/mongo_dart.dart' as M;
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../provider/user_provider.dart';
 
@@ -26,7 +22,7 @@ String? selectedItem = "Work";
 // String dropDownValue = "Work";
 
 class _AddEventState extends State<AddEvent> {
-  final TextEditingController eventTitileController = TextEditingController();
+  var eventTitleController = TextEditingController();
   final TextEditingController eventDescriptionController =
       TextEditingController();
   TimeOfDay time = TimeOfDay.now();
@@ -85,9 +81,10 @@ class _AddEventState extends State<AddEvent> {
                               style: TextStyle(color: Colors.grey),
                             ),
                           ),
-                          const Padding(
+                          Padding(
                             padding: EdgeInsets.only(right: 20, left: 20),
                             child: TextField(
+                              controller: eventTitleController,
                               decoration: InputDecoration(
                                 border: UnderlineInputBorder(),
                                 hintText: 'Enter event title',
@@ -101,9 +98,10 @@ class _AddEventState extends State<AddEvent> {
                               style: TextStyle(color: Colors.grey),
                             ),
                           ),
-                          const Padding(
+                          Padding(
                             padding: EdgeInsets.only(left: 20, right: 20),
                             child: TextField(
+                              controller: eventDescriptionController,
                               decoration: InputDecoration(
                                 border: UnderlineInputBorder(),
                                 hintText: 'Enter event Description',
@@ -209,10 +207,10 @@ class _AddEventState extends State<AddEvent> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _insertData(
-              eventTitileController.text,
+              eventTitleController.text,
               eventDescriptionController.text,
               selectedItem.toString(),
-              "${time} to ${time1}",
+              "${time.format(context)} to ${time1.format(context)}",
               '${date1.day}/${date1.month}/${date1.year}');
         },
         child: const Icon(Icons.add),
@@ -222,17 +220,28 @@ class _AddEventState extends State<AddEvent> {
 
   Future<void> _insertData(String eventTitle, String eventDescription,
       String eventType, String duration, String day) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     var _id = M.ObjectId();
     final data = EventModel(
         id: _id,
-        empId: Provider.of<UserProvider>(context).user.id,
+        empId: prefs.getString('uid').toString(),
         eventTitle: eventTitle,
         eventDescription: eventDescription,
         eventType: eventType,
         duration: duration,
-        day: day);
+        day: day,
+        email: prefs.getString('email').toString());
     var result = await MongoDatabase.insertEvent(data);
     showSnackBar(context, "Event added");
     print(result);
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is removed from the widget tree.
+    // This also removes the _printLatestValue listener.
+    eventTitleController.dispose();
+    eventDescriptionController.dispose();
+    super.dispose();
   }
 }
