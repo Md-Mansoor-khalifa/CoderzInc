@@ -16,7 +16,8 @@ class EventModel {
       required this.eventType,
       required this.duration,
       required this.day,
-      required this.email});
+      required this.email,
+      required this.timeTaken});
 
   ObjectId id;
   String empId;
@@ -26,6 +27,7 @@ class EventModel {
   String duration;
   String day;
   String email;
+  String timeTaken;
 
   factory EventModel.fromJson(Map<String, dynamic> json) => EventModel(
       id: json["_id"],
@@ -35,7 +37,8 @@ class EventModel {
       eventType: json["eventType"],
       duration: json["duration"],
       day: json["day"],
-      email: json["email"]);
+      email: json["email"],
+      timeTaken: json['timeTaken']);
 
   Map<String, dynamic> toJson() => {
         "_id": id,
@@ -45,6 +48,7 @@ class EventModel {
         "eventDescription": eventDescription,
         "duration": duration,
         "day": day,
-        "email": email
+        "email": email,
+        "timeTaken": timeTaken
       };
 }

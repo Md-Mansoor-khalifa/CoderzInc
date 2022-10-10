@@ -26,9 +26,37 @@ class MongoDatabase {
     return arrData;
   }
 
-  static Future<List<Map<String, dynamic>>> getUserEvents(String email) async {
-    final arrEvents =
-        await eventCollection.find(where.eq("email", email)).toList();
+  static Future<List<Map<String, dynamic>>> getbreakTime(email, date) async {
+    final arrData = await eventCollection
+        .find(where.eq("email", email).eq("day", date).eq("eventType", "Break"))
+        .toList();
+    return arrData;
+  }
+
+  static Future<List<Map<String, dynamic>>> getWorkTime(email, date) async {
+    final arrData = await eventCollection
+        .find(where.eq("email", email).eq("day", date).eq("eventType", "Work"))
+        .toList();
+    return arrData;
+  }
+
+  static Future<List<Map<String, dynamic>>> getMeetingTime(email, date) async {
+    final arrData = await eventCollection
+        .find(
+            where.eq("email", email).eq("day", date).eq("eventType", "Meeting"))
+        .toList();
+    return arrData;
+  }
+
+  static Future<List<Map<String, dynamic>>> getUserEvents(
+      String email, String date) async {
+    final arrEvents = await eventCollection
+        .find(where.eq("email", email).eq("day", date))
+        .toList();
+
+    print(date);
+
+    // print(email);
 
     return arrEvents;
   }

@@ -1,4 +1,6 @@
+import 'package:coderz_inc/services/auth_services.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class AdminAddEmployee extends StatefulWidget {
   const AdminAddEmployee({super.key});
@@ -7,14 +9,18 @@ class AdminAddEmployee extends StatefulWidget {
   State<AdminAddEmployee> createState() => _AdminAddEmployee();
 }
 
-List<String> items = <String>["Android", "Web", "Flutter", "Management"];
-String dropDownValue = "Management";
+final items = ["user", "admin"];
+String selectedItem = "user";
 
 class _AdminAddEmployee extends State<AdminAddEmployee> {
+  var nameController = TextEditingController();
+  var emailController = TextEditingController();
+  var passwordController = TextEditingController();
+  var phoneNumberController = TextEditingController();
+  var departmentController = TextEditingController();
   TimeOfDay time = TimeOfDay.now();
   TimeOfDay time1 = TimeOfDay.now();
   DateTime date1 = DateTime.now();
-
   void _showDatePicker() {
     showDatePicker(
       context: context,
@@ -28,6 +34,21 @@ class _AdminAddEmployee extends State<AdminAddEmployee> {
     });
   }
 
+  final AuthService authService = AuthService();
+  void signUp() {
+    var formatter = new DateFormat('dd/MM/yyyy');
+    authService.signUpUser(
+      context: context,
+      email: emailController.text,
+      password: passwordController.text,
+      department: departmentController.text,
+      joiningDate: formatter.format(date1).toString(),
+      name: nameController.text,
+      phoneNumber: phoneNumberController.text,
+      role: selectedItem,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,7 +57,7 @@ class _AdminAddEmployee extends State<AdminAddEmployee> {
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
           margin:
-              const EdgeInsets.only(top: 50, left: 20, right: 20, bottom: 20),
+              const EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 20),
           // color: Color.fromARGB(255, 172, 172, 172),
           child: Column(
             children: [
@@ -68,9 +89,10 @@ class _AdminAddEmployee extends State<AdminAddEmployee> {
                               style: TextStyle(color: Colors.grey),
                             ),
                           ),
-                          const Padding(
+                          Padding(
                             padding: EdgeInsets.only(right: 20, left: 20),
                             child: TextField(
+                              controller: nameController,
                               decoration: InputDecoration(
                                 border: UnderlineInputBorder(),
                                 hintText: 'Enter Employee Name',
@@ -85,9 +107,10 @@ class _AdminAddEmployee extends State<AdminAddEmployee> {
                               style: TextStyle(color: Colors.grey),
                             ),
                           ),
-                          const Padding(
+                          Padding(
                             padding: EdgeInsets.only(left: 20, right: 20),
                             child: TextField(
+                              controller: emailController,
                               decoration: InputDecoration(
                                 border: UnderlineInputBorder(),
                                 hintText: 'Enter Employee Email',
@@ -98,16 +121,17 @@ class _AdminAddEmployee extends State<AdminAddEmployee> {
                             padding:
                                 EdgeInsets.only(left: 8, right: 8, top: 12),
                             child: Text(
-                              "Contact number",
+                              "Contact Number",
                               style: TextStyle(color: Colors.grey),
                             ),
                           ),
-                          const Padding(
+                          Padding(
                             padding: EdgeInsets.only(left: 20, right: 20),
                             child: TextField(
+                              controller: phoneNumberController,
                               decoration: InputDecoration(
                                 border: UnderlineInputBorder(),
-                                hintText: 'Enter Contact number',
+                                hintText: 'Enter Contact Nmber',
                               ),
                             ),
                           ),
@@ -115,7 +139,25 @@ class _AdminAddEmployee extends State<AdminAddEmployee> {
                             padding:
                                 EdgeInsets.only(left: 8, right: 8, top: 12),
                             child: Text(
-                              "Event type",
+                              "Department",
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 20, right: 20),
+                            child: TextField(
+                              controller: departmentController,
+                              decoration: InputDecoration(
+                                border: UnderlineInputBorder(),
+                                hintText: 'Enter Department Name',
+                              ),
+                            ),
+                          ),
+                          const Padding(
+                            padding:
+                                EdgeInsets.only(left: 8, right: 8, top: 12),
+                            child: Text(
+                              "Role",
                               style: TextStyle(color: Colors.grey),
                             ),
                           ),
@@ -123,19 +165,19 @@ class _AdminAddEmployee extends State<AdminAddEmployee> {
                             padding: const EdgeInsets.only(left: 20, right: 20),
                             child: Row(
                               children: [
-                                DropdownButton(
-                                  value: dropDownValue,
-                                  items: items.map(
-                                    (String items) {
-                                      return DropdownMenuItem(
-                                        value: items,
-                                        child: Text(items),
-                                      );
-                                    },
-                                  ).toList(),
-                                  onChanged: (String? newValue) {
+                                DropdownButton<String>(
+                                  value: selectedItem,
+                                  items: items
+                                      .map(
+                                        (items) => DropdownMenuItem<String>(
+                                          value: items,
+                                          child: Text(items),
+                                        ),
+                                      )
+                                      .toList(),
+                                  onChanged: (newValue) {
                                     setState(() {
-                                      dropDownValue = newValue!;
+                                      selectedItem = newValue!;
                                     });
                                   },
                                 ),
@@ -149,9 +191,10 @@ class _AdminAddEmployee extends State<AdminAddEmployee> {
                               style: TextStyle(color: Colors.grey),
                             ),
                           ),
-                          const Padding(
+                          Padding(
                             padding: EdgeInsets.only(left: 20, right: 20),
                             child: TextField(
+                              controller: passwordController,
                               decoration: InputDecoration(
                                 border: UnderlineInputBorder(),
                                 hintText: 'Enter password',
@@ -192,9 +235,21 @@ class _AdminAddEmployee extends State<AdminAddEmployee> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: signUp,
         child: const Icon(Icons.add),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is removed from the widget tree.
+    // This also removes the _printLatestValue listener.
+    nameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    phoneNumberController.dispose();
+    departmentController.dispose();
+    super.dispose();
   }
 }

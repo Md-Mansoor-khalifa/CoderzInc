@@ -4,6 +4,7 @@ import 'package:coderz_inc/Screens/AddEvent.dart';
 import 'package:coderz_inc/Screens/AdminDashboardScreen.dart';
 import 'package:coderz_inc/Screens/HomeScreen.dart';
 import 'package:coderz_inc/Screens/LoginScreen.dart';
+import 'package:coderz_inc/Screens/employeedashboard.dart';
 import 'package:coderz_inc/models/user.dart';
 import 'package:coderz_inc/provider/user_provider.dart';
 import 'package:coderz_inc/utils/constants.dart';
@@ -20,6 +21,9 @@ class AuthService {
     required String password,
     required String name,
     required String role,
+    required String department,
+    required String joiningDate,
+    required String phoneNumber,
   }) async {
     try {
       User user = User(
@@ -29,8 +33,11 @@ class AuthService {
         email: email,
         role: role,
         token: '',
+        department: department,
+        joiningDate: joiningDate,
+        phoneNumber: phoneNumber,
       );
-
+      final navigator = Navigator.of(context);
       http.Response res = await http.post(
         Uri.parse('${Constants.uri}/api/signup'),
         body: user.toJson(),
@@ -45,7 +52,13 @@ class AuthService {
         onSuccess: () {
           showSnackBar(
             context,
-            'Account created! Login with the same credentials!',
+            'Employee Added',
+          );
+          navigator.pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (context) => const AdminDashboardScreen(),
+            ),
+            (route) => false,
           );
         },
       );
@@ -92,7 +105,7 @@ class AuthService {
           } else if (jsonDecode(res.body)['role'] == "user") {
             navigator.pushAndRemoveUntil(
               MaterialPageRoute(
-                builder: (context) => const AddEvent(),
+                builder: (context) => const EmployeeDashboard(),
               ),
               (route) => false,
             );

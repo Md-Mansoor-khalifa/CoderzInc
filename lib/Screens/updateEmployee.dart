@@ -1,47 +1,70 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:bson/src/classes/object_id.dart';
 import 'package:coderz_inc/dbHelper/mongodb.dart';
+import 'package:coderz_inc/utils/bar_chart_model.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:pie_chart/pie_chart.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-
-class UpdateEmployee extends StatefulWidget {
-  String email;
-  UpdateEmployee({
-    Key? key,
-    required this.email,
-  }) : super(key: key);
-
-  @override
-  State<UpdateEmployee> createState() => _UpdateEmployeeState();
-}
+import 'package:charts_flutter/flutter.dart' as charts;
 
 // ############################################################################
 // ############################################################################
 class PieChatPage extends StatelessWidget {
-  const PieChatPage({super.key});
+  final totalBreakTime,
+      totalMeetingTime,
+      totalWorkTime,
+      ptotalBreakTime,
+      ptotalWorkTime,
+      ptotalMeetingTime;
+  PieChatPage(
+      {super.key,
+      required this.totalBreakTime,
+      required this.totalMeetingTime,
+      required this.totalWorkTime,
+      required this.ptotalBreakTime,
+      required this.ptotalWorkTime,
+      required this.ptotalMeetingTime});
 
   @override
   Widget build(BuildContext context) {
-    final List<ChartData> chartData = [
-      ChartData("10/10/10", 50, 15, 30, 5),
-      ChartData("11/10/10", 60, 15, 20, 5),
-      ChartData("12/10/10", 70, 15, 10, 5),
-      ChartData("13/10/10", 15, 50, 5, 30),
+    final List<BarChartModel> data = [
+      BarChartModel(
+        eventType: "Working",
+        time: int.parse(totalWorkTime),
+        color: charts.ColorUtil.fromDartColor(Colors.blue),
+      ),
+      BarChartModel(
+        eventType: "Meeting",
+        time: int.parse(totalMeetingTime),
+        color: charts.ColorUtil.fromDartColor(Colors.green),
+      ),
+      BarChartModel(
+        eventType: "Not Working",
+        time: int.parse(totalBreakTime),
+        color: charts.ColorUtil.fromDartColor(Colors.red),
+      ),
     ];
-
     Map<String, double> dataMap_ThatDay = {
-      "Meeting": 50,
-      "Break": 15,
-      "Work": 30,
-      "Others": 5,
+      "Meeting": double.parse(totalMeetingTime),
+      "Break": double.parse(totalBreakTime),
+      "Work": double.parse(totalWorkTime),
     };
     Map<String, double> dataMap_AfterDay = {
-      "Meeting": 50,
-      "Break": 15,
-      "Work": 30,
-      "Others": 5,
+      "Meeting": double.parse(ptotalMeetingTime),
+      "Break": double.parse(ptotalBreakTime),
+      "Work": double.parse(ptotalWorkTime),
     };
+
+    List<charts.Series<BarChartModel, String>> series = [
+      charts.Series(
+        id: "time",
+        data: data,
+        domainFn: (BarChartModel series, _) => series.eventType,
+        measureFn: (BarChartModel series, _) => series.time,
+        colorFn: (BarChartModel series, _) => series.color,
+      ),
+    ];
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -80,42 +103,13 @@ class PieChatPage extends StatelessWidget {
               Divider(
                 color: Colors.black,
               ),
-              SfCartesianChart(
-                primaryXAxis: CategoryAxis(),
-                legend: Legend(
-                  isVisible: true,
-                  title: LegendTitle(
-                      text: 'Events',
-                      textStyle: TextStyle(
-                          color: Colors.black,
-                          fontSize: 15,
-                          fontStyle: FontStyle.italic,
-                          fontWeight: FontWeight.w900)),
-                  // Templating the legend item
-                  // legendItemBuilder: (String name, dynamic series,
-                  //     dynamic point, int index) {
-                  //   return ;
-                  // }
+              Container(
+                height: 350,
+                child: charts.BarChart(
+                  series,
+                  animate: true,
                 ),
-                series: <ChartSeries>[
-                  StackedColumnSeries<ChartData, String>(
-                      dataSource: chartData,
-                      xValueMapper: (ChartData ch, _) => ch.x,
-                      yValueMapper: (ChartData ch, _) => ch.y1),
-                  StackedColumnSeries<ChartData, String>(
-                      dataSource: chartData,
-                      xValueMapper: (ChartData ch, _) => ch.x,
-                      yValueMapper: (ChartData ch, _) => ch.y2),
-                  StackedColumnSeries<ChartData, String>(
-                      dataSource: chartData,
-                      xValueMapper: (ChartData ch, _) => ch.x,
-                      yValueMapper: (ChartData ch, _) => ch.y3),
-                  StackedColumnSeries<ChartData, String>(
-                      dataSource: chartData,
-                      xValueMapper: (ChartData ch, _) => ch.x,
-                      yValueMapper: (ChartData ch, _) => ch.y4),
-                ],
-              ),
+              )
             ],
           ),
         ),
@@ -124,30 +118,35 @@ class PieChatPage extends StatelessWidget {
   }
 }
 
-class ChartData {
-  final String x;
-  final int y1;
-  final int y2;
-  final int y3;
-  final int y4;
+// #####################################################################
+// #####################################################################
 
-  ChartData(this.x, this.y1, this.y2, this.y3, this.y4);
+class UpdateEmployee extends StatefulWidget {
+  String email;
+  UpdateEmployee({
+    Key? key,
+    required this.email,
+  }) : super(key: key);
+
+  @override
+  State<UpdateEmployee> createState() => _UpdateEmployeeState();
 }
 
-// #####################################################################
-// #####################################################################
-
 class _UpdateEmployeeState extends State<UpdateEmployee> {
-  @override
-  Widget build(BuildContext context) {
-    var name = "name",
-        email = "email",
-        phone = "phone",
-        date = "joining date",
-        department = "department";
-    final deviceHeight = MediaQuery.of(context).size.height;
-    final deviceWidth = MediaQuery.of(context).size.width;
+  var name = "name",
+      email = "email",
+      phone = "phone",
+      date = "joining date",
+      department = "department",
+      totalBreakTime = 0,
+      totalWorkTime = 0,
+      totalMeetingTime = 0,
+      ptotalBreakTime = 0,
+      ptotalWorkTime = 0,
+      ptotalMeetingTime = 0;
 
+  @override
+  void initState() {
     MongoDatabase.getOneUser(widget.email).then((value) {
       setState(() {
         name = value[0]['name'].toString();
@@ -157,6 +156,59 @@ class _UpdateEmployeeState extends State<UpdateEmployee> {
         department = value[0]['department'].toString();
       });
     });
+
+    var formatter = new DateFormat('dd/MM/yyyy');
+    String formattedDate = formatter.format(DateTime.now());
+
+    MongoDatabase.getbreakTime(widget.email, formattedDate).then((value) {
+      for (int i = 0; i < value.length; i++) {
+        totalBreakTime += int.parse(value[i]['timeTaken'].toString());
+      }
+      setState(() {});
+    });
+
+    MongoDatabase.getWorkTime(widget.email, formattedDate).then((value) {
+      for (int i = 0; i < value.length; i++) {
+        totalWorkTime += int.parse(value[i]['timeTaken'].toString());
+      }
+      setState(() {});
+    });
+    MongoDatabase.getMeetingTime(widget.email, formattedDate).then((value) {
+      for (int i = 0; i < value.length; i++) {
+        totalMeetingTime += int.parse(value[i]['timeTaken'].toString());
+      }
+      setState(() {});
+    });
+
+    String pformattedData =
+        formatter.format(DateTime.now().subtract(Duration(days: 1)));
+    MongoDatabase.getbreakTime(widget.email, pformattedData).then((value) {
+      for (int i = 0; i < value.length; i++) {
+        ptotalBreakTime += int.parse(value[i]['timeTaken'].toString());
+      }
+      setState(() {});
+    });
+
+    MongoDatabase.getWorkTime(widget.email, pformattedData).then((value) {
+      for (int i = 0; i < value.length; i++) {
+        ptotalWorkTime += int.parse(value[i]['timeTaken'].toString());
+      }
+      setState(() {});
+    });
+
+    MongoDatabase.getMeetingTime(widget.email, pformattedData).then((value) {
+      for (int i = 0; i < value.length; i++) {
+        ptotalMeetingTime += int.parse(value[i]['timeTaken'].toString());
+      }
+      setState(() {});
+    });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final deviceHeight = MediaQuery.of(context).size.height;
+    final deviceWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
         body: SafeArea(
@@ -328,7 +380,14 @@ class _UpdateEmployeeState extends State<UpdateEmployee> {
                   height: deviceHeight * 0.40,
                   width: deviceWidth * 0.95,
                   color: Colors.blue[100],
-                  child: PieChatPage(),
+                  child: PieChatPage(
+                    totalBreakTime: totalBreakTime.toString(),
+                    totalWorkTime: totalWorkTime.toString(),
+                    totalMeetingTime: totalMeetingTime.toString(),
+                    ptotalBreakTime: ptotalBreakTime.toString(),
+                    ptotalWorkTime: ptotalWorkTime.toString(),
+                    ptotalMeetingTime: ptotalMeetingTime.toString(),
+                  ),
                   // decoration: BoxDecoration(
                   //   // color: Colors.blue[400],
                   //   borderRadius: BorderRadius.circular(25),
@@ -347,21 +406,21 @@ class _UpdateEmployeeState extends State<UpdateEmployee> {
                   //   top: 0,
                   // ),
                   // color: Colors.red,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    child: Text(
-                      'Edit Profile',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 22,
-                          color: Colors.black),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                        primary: Colors.blue[100],
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(60),
-                        )),
-                  ),
+                  // child: ElevatedButton(
+                  //   onPressed: () {},
+                  //   child: Text(
+                  //     'Edit Profile',
+                  //     style: TextStyle(
+                  //         fontWeight: FontWeight.bold,
+                  //         fontSize: 22,
+                  //         color: Colors.black),
+                  //   ),
+                  //   style: ElevatedButton.styleFrom(
+                  //       primary: Colors.blue[100],
+                  //       shape: RoundedRectangleBorder(
+                  //         borderRadius: BorderRadius.circular(60),
+                  //       )),
+                  // ),
 
                   // child: Container(
                   //   color: Colors.green,

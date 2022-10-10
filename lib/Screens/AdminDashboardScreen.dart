@@ -1,6 +1,8 @@
 import 'package:coderz_inc/EmployeeModel.dart';
+import 'package:coderz_inc/Screens/AdminAddEmployee.dart';
 import 'package:coderz_inc/Screens/updateEmployee.dart';
 import 'package:coderz_inc/dbHelper/mongodb.dart';
+import 'package:coderz_inc/services/auth_services.dart';
 import 'package:flutter/material.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
@@ -22,27 +24,19 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       appBar: AppBar(
         centerTitle: true,
         title: const Text("Employees"),
-        leading: const BackButton(),
         actions: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: DropdownButton(
-              items: items.map(
-                (String items) {
-                  return DropdownMenuItem(
-                    value: items,
-                    child: Text(items),
+            child: PopupMenuButton<String>(
+              onSelected: handleClick,
+              itemBuilder: ((context) {
+                return {'Logout'}.map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(choice),
                   );
-                },
-              ).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  dropdownvalue = newValue!;
-                });
-              },
-              icon: const Icon(Icons.filter_alt),
-              iconEnabledColor: Colors.white,
-              isExpanded: false,
+                }).toList();
+              }),
             ),
           ),
         ],
@@ -78,7 +72,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AdminAddEmployee(),
+            ),
+          );
+        },
         child: const Icon(Icons.add),
       ),
     );
@@ -106,15 +107,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               child: Row(
                 children: [
                   Container(
-                    child: const Padding(
-                      padding: EdgeInsets.all(12.0),
-                      child: CircleAvatar(
-                        radius: 35,
-                      ),
-                    ),
-                  ),
-                  Container(
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -129,7 +123,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Column(
-                            children: [Text(data.email), Text(data.department)],
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(data.email),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Text(data.department)
+                            ],
                           ),
                         )
                       ],
@@ -141,4 +142,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           ),
         ),
       );
+  final AuthService authService = AuthService();
+  void handleClick(String value) {
+    switch (value) {
+      case 'Logout':
+        authService.signOut(context);
+        break;
+    }
+  }
 }

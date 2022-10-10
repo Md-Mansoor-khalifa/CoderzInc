@@ -1,7 +1,9 @@
+import 'package:coderz_inc/Screens/employeedashboard.dart';
 import 'package:coderz_inc/dbHelper/mongodb.dart';
 import 'package:coderz_inc/utils/EventModel.dart';
 import 'package:coderz_inc/utils/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'package:mongo_dart/mongo_dart.dart' as M;
 import 'package:provider/provider.dart';
@@ -16,7 +18,7 @@ class AddEvent extends StatefulWidget {
   State<AddEvent> createState() => _AddEventState();
 }
 
-final items = ["Work", "Meeting", "Break", "Other"];
+final items = ["Work", "Meeting", "Break"];
 String? selectedItem = "Work";
 // List<String> items = <String>["Work", "Meeting", "Break", "Other"];
 // String dropDownValue = "Work";
@@ -38,12 +40,16 @@ class _AddEventState extends State<AddEvent> {
     ).then((value) {
       setState(() {
         date1 = value!;
+        var formatter = new DateFormat('dd/MM/yyyy');
+        String formattedDate = formatter.format(date1);
       });
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    var formatter = new DateFormat('dd/MM/yyyy');
+    String formattedDate = formatter.format(date1);
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -206,12 +212,16 @@ class _AddEventState extends State<AddEvent> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          var time1min = time1.hour * 60 + time1.minute;
+          var timemin = time.hour * 60 + time.minute;
+          var diff = time1min - timemin;
           _insertData(
               eventTitleController.text,
               eventDescriptionController.text,
               selectedItem.toString(),
               "${time.format(context)} to ${time1.format(context)}",
-              '${date1.day}/${date1.month}/${date1.year}');
+              formattedDate,
+              diff.toString());
         },
         child: const Icon(Icons.add),
       ),
@@ -219,7 +229,7 @@ class _AddEventState extends State<AddEvent> {
   }
 
   Future<void> _insertData(String eventTitle, String eventDescription,
-      String eventType, String duration, String day) async {
+      String eventType, String duration, String day, String timeTaken) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var _id = M.ObjectId();
     final data = EventModel(
@@ -230,9 +240,14 @@ class _AddEventState extends State<AddEvent> {
         eventType: eventType,
         duration: duration,
         day: day,
+        timeTaken: timeTaken,
         email: prefs.getString('email').toString());
     var result = await MongoDatabase.insertEvent(data);
     showSnackBar(context, "Event added");
+    setState(() {
+      Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => EmployeeDashboard()));
+    });
     print(result);
   }
 

@@ -1,4 +1,3 @@
 class Constants {
-  static String uri = 'http://192.168.1.3:5000';
+  static String uri = 'https://coderzapi.vercel.app';
 }
-//192.168.1.1
